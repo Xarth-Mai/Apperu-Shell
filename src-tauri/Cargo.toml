@@ -2,7 +2,7 @@
 name = "apperu-shell"
 version = "0.1.0"
 description = "Performance-first Linux wrapper for Apple Music Web"
-authors = ["Apperu"]
+authors = ["Xarth-Mai"]
 license = "MIT"
 edition = "2021"
 
@@ -16,7 +16,12 @@ tauri = { version = "2", features = ["tray-icon"] }
 tauri-plugin-notification = "2"
 tauri-plugin-global-shortcut = "2"
 zbus = "4"
-tokio = { version = "1", features = ["sync", "time", "rt-multi-thread", "macros"] }
+tokio = { version = "1", features = [
+    "sync",
+    "time",
+    "rt-multi-thread",
+    "macros",
+] }
 chrono = { version = "0.4", features = ["serde"] }
 
 [features]
