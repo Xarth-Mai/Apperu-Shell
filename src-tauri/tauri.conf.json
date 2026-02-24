@@ -1,0 +1,36 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "Apperu Shell",
+  "version": "0.1.0",
+  "identifier": "com.apperu.shell",
+  "build": {
+    "beforeDevCommand": "",
+    "devUrl": "",
+    "frontendDist": "web"
+  },
+  "app": {
+    "withGlobalTauri": true,
+    "windows": [
+      {
+        "title": "Apperu Shell",
+        "label": "main",
+        "width": 1280,
+        "height": 860,
+        "url": "https://music.apple.com/",
+        "visible": false
+      }
+    ],
+    "security": {
+      "csp": null
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": ["appimage"],
+    "linux": {
+      "appimage": {
+        "bundleMediaFramework": false
+      }
+    }
+  }
+}
