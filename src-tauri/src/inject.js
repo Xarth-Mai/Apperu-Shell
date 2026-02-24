@@ -1,7 +1,28 @@
 (() => {
-  const emit = (payload) => {
+  if (window.__apperuCleanup) {
+    window.__apperuCleanup();
+  }
+
+  const invokeUpdate = async (payload) => {
+    if (window.__TAURI__?.core?.invoke) {
+      try {
+        await window.__TAURI__.core.invoke("update_player_state", { state: payload });
+      } catch (err) {
+        console.warn("[apperu] failed to invoke update_player_state", err);
+      }
+    }
+  };
+
+  const emitPlayerState = async (payload) => {
+    await invokeUpdate(payload);
     if (window.__TAURI__?.event?.emit) {
       window.__TAURI__.event.emit("player_state", payload);
+    }
+  };
+
+  const emitDrmState = (payload) => {
+    if (window.__TAURI__?.event?.emit) {
+      window.__TAURI__.event.emit("drm_status", payload);
     }
   };
 
@@ -47,12 +68,12 @@
   const probeDrm = async () => {
     try {
       if (!navigator.requestMediaKeySystemAccess) {
-        emit({ drm_supported: false, reason: "EME API unavailable in WebView" });
+        emitDrmState({ drm_supported: false, reason: "EME API unavailable in WebView" });
         return;
       }
-      emit({ drm_supported: true });
+      emitDrmState({ drm_supported: true });
     } catch (err) {
-      emit({ drm_supported: false, reason: String(err) });
+      emitDrmState({ drm_supported: false, reason: String(err) });
     }
   };
 
@@ -64,13 +85,20 @@
     const key = `${state.playing}|${state.title}|${state.artist}|${state.album}`;
     if (key !== lastKey) {
       lastKey = key;
-      emit(state);
+      emitPlayerState(state);
     }
   };
 
   probeDrm();
   tick();
+
   const observer = new MutationObserver(() => tick());
   observer.observe(document.body, { subtree: true, childList: true, characterData: true });
-  setInterval(tick, 800);
+  const intervalId = setInterval(tick, 800);
+
+  window.__apperuCleanup = () => {
+    observer.disconnect();
+    clearInterval(intervalId);
+    delete window.__apperuCleanup;
+  };
 })();
