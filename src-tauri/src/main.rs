@@ -120,6 +120,12 @@ fn main() {
 
             let js = include_str!("inject.js");
             main_window.eval(js)?;
+
+            let js_on_load = js.to_string();
+            main_window.on_page_load(move |window, _payload| {
+                let _ = window.eval(&js_on_load);
+            });
+
             main_window.show()?;
 
             Ok(())
