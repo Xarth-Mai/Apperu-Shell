@@ -1,92 +1,103 @@
 # Apperu Shell
 
-Apperu Shell is a Linux desktop shell client based on Apple Music Web.  
-The project aims to provide better desktop integration and performance optimization on Linux without modifying official services, reverse engineering, or bypassing DRM.
-
 > Other languages: [简体中文](README.md) | [日本語](README.ja.md) | [繁體中文](README.zh-TW.md)
 
-## Project Positioning
+Apperu Shell is a lightweight desktop wrapper that brings the Apple Music Web experience to Linux.
 
-Apperu Shell is not a standalone player and does not implement audio decoding or protocol reverse engineering.
+It runs on the official web version and enhances desktop integration and startup performance.
 
-It runs on top of the web version at <https://music.apple.com> and provides:
+## ✨ Project Goals
 
-- Linux desktop integration (MPRIS / media keys / tray)
-- Cold-start experience optimization (prewarm / tray keep-alive)
+- Provide a more native-like Apple Music desktop experience on Linux
+- Offer a lighter and more controllable runtime than a full browser
+- Optimize cold start speed and background residency
+- Maintain maximum compatibility with the official web version
+
+## 🎯 Features
+
+- Linux desktop integration
+  - MPRIS support
+  - Media key control
+  - System tray support
+- Cold start optimization
+  - WebView prewarming
+  - Tray keep-alive
 - Desktop notifications
-- Lightweight packaging (Tauri-first)
+- Lightweight wrapper architecture (based on Tauri)
 
-## Project Goals
+## 🚀 Quick Start
 
-- Provide a stable runtime container for Apple Music Web
-- Deliver complete MPRIS support (recognizable in GNOME / KDE)
-- Support keyboard media controls
-- Support tray residency and quick restore
-- Do not implement DRM bypass or audio extraction
+### Runtime Requirements
 
-## Tech Stack (Planned)
+- WebKitGTK (with EME support)
+- GStreamer
+- gst-plugins-base
+- gst-plugins-good
+- gst-libav
+- Widevine component (for DRM)
 
-- Tauri v2
+> If the system WebView does not support DRM, the application will function only as a web container without audio playback.
+
+## 🎵 Playback & Runtime Architecture
+
+Apperu Shell runs on the system WebKitGTK and does not embed its own browser engine.
+
+All playback behavior is handled by the system WebView.
+
+This project does not implement audio decoding or modify playback protocols. It acts purely as a desktop wrapper.
+
+Apple Music Web uses EME + Widevine DRM.
+
+On Linux, playback capability depends on:
+
+- Whether WebKitGTK is built with EME support
+- Whether Widevine is correctly installed
+- Whether required GStreamer plugins are available
+
+DRM support varies across distributions.
+In some environments, the application may function only as a web container.
+
+Apperu Shell does not guarantee playback support on all distributions.
+
+## 🛠 Development & Build
+
+Required only for development or building:
+
 - Rust
-- WebKitGTK (Linux WebView)
-- zbus (DBus / MPRIS)
-- Tauri plugins (tray / notifications / shortcuts)
+- Tauri CLI
 
-## Performance Strategy
-
-- Persistent WebView profile (cache & cookies)
-- Startup prewarm (initialize WebView before showing the window)
-- Tray keep-alive by default (avoid frequent cold starts)
-- State sync throttling (avoid high-frequency polling)
-
-No custom offline cache for static assets is planned; it relies on WebView engine caching.
-
-## DRM and Playback Notes
-
-Apple Music Web uses DRM (EME/Widevine).  
-Playback capability depends on system WebKitGTK and related components.
-
-Apperu Shell does not guarantee audio playback on all Linux distributions.  
-If the system WebView does not support DRM, the app will only function as a web container.
-
-## Build (Planned)
+### Development Mode
 
 ```bash
-# Requires Rust and Tauri CLI
 cargo tauri dev
 ```
 
-Package:
+### Build
 
 ```bash
 cargo tauri build
 ```
 
-Planned releases:
+## 🤝 Contributing
 
-- AppImage
-- AUR package (later)
+Issues and Pull Requests are welcome.
 
-## Development Stages
+Before submitting a PR, please ensure:
 
-- WebView container and login persistence
-- Playback state probe
-- JS injection and state bridge
-- MPRIS implementation
-- Media key support
-- Tray and notifications
-- Startup prewarm and keep-alive optimization
+- No DRM bypass behavior is introduced
+- Official web logic is not modified
+- The wrapper remains minimally invasive
 
-## License
+## 📜 License
 
 This project is licensed under Mozilla Public License Version 2.0 (MPL-2.0).
 
-See [LICENSE](LICENSE) for details.
+See LICENSE for details.
 
----
+## ⚠ Disclaimer
 
-## Disclaimer
+Apperu Shell is not affiliated with Apple Inc.
 
-Apperu Shell is not affiliated with Apple Inc.  
-Apple Music is a trademark and service of Apple Inc.  
-This project is a web wrapper tool only and does not provide any infringing or authorization-bypassing functionality.
+Apple Music is a trademark and service of Apple Inc.
+
+This project provides web wrapping and desktop integration only and does not include any DRM circumvention or modification.

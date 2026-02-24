@@ -1,92 +1,103 @@
 # Apperu Shell
 
-Apperu Shell 是一個基於 Apple Music Web 的 Linux 桌面客戶端殼程式。  
-本專案目標是在不修改官方服務、不涉及逆向或 DRM 破解的前提下，為 Linux 提供更好的桌面整合體驗與效能優化。
+> Other languages: [简体中文](README.md) | [English](README.en.md) | [日本語](README.ja.md)
 
-> 其他語言版本：[简体中文](README.md) | [English](README.en.md) | [日本語](README.ja.md)
+Apperu Shell 是一個為 Linux 提供 Apple Music Web 桌面體驗的輕量封裝應用。
 
-## 專案定位
+基於官方網頁版本運行，強化桌面整合與啟動效能。
 
-Apperu Shell 不是獨立播放器，不實作音訊解碼或協定逆向。
+## ✨ 專案目標
 
-它基於 <https://music.apple.com> 的網頁版本運行，並提供：
+- 為 Linux 提供更接近原生應用的 Apple Music 桌面體驗
+- 提供比瀏覽器更輕量且可控的執行環境
+- 優化冷啟動速度與背景常駐體驗
+- 維持對官方 Web 版本的最大相容性
 
-- Linux 桌面整合（MPRIS / 媒體鍵 / 系統匣）
-- 冷啟動體感優化（預熱 / 系統匣保活）
+## 🎯 功能特色
+
+- Linux 桌面整合
+  - 支援 MPRIS
+  - 媒體鍵控制
+  - 系統匣支援
+- 冷啟動最佳化
+  - WebView 預熱
+  - 系統匣保活
 - 桌面通知
-- 輕量化封裝（優先 Tauri）
+- 輕量封裝架構（基於 Tauri）
 
-## 專案目標
+## 🚀 快速開始
 
-- 提供穩定的 Apple Music Web 運行容器
-- 實作完整 MPRIS 支援（GNOME / KDE 可識別）
-- 支援鍵盤媒體控制
-- 支援系統匣駐留與快速恢復
-- 不實作 DRM 繞過或音訊擷取功能
+### 執行環境需求
 
-## 技術棧（規劃）
+- WebKitGTK（需支援 EME）
+- GStreamer
+- gst-plugins-base
+- gst-plugins-good
+- gst-libav
+- Widevine 元件（用於 DRM）
 
-- Tauri v2
+> 若系統 WebView 不支援 DRM，應用程式將僅作為網頁容器運行，無法播放音訊。
+
+## 🎵 播放與執行機制說明
+
+Apperu Shell 基於系統 WebKitGTK 運行，並不內建瀏覽器引擎。
+
+所有播放行為皆由系統 WebView 負責。
+
+本專案不實作音訊解碼，也不修改播放協議，僅作為桌面封裝層。
+
+Apple Music Web 使用 EME + Widevine DRM。
+
+在 Linux 上，播放能力取決於：
+
+- WebKitGTK 是否啟用 EME
+- 系統是否正確安裝 Widevine
+- 是否具備完整的 GStreamer 插件
+
+不同發行版對 DRM 的支援程度不同。
+在某些環境下可能僅能作為網頁容器使用。
+
+Apperu Shell 不保證在所有發行版上皆可正常播放。
+
+## 🛠 開發與建置
+
+僅於開發或建置時需要：
+
 - Rust
-- WebKitGTK（Linux WebView）
-- zbus（DBus / MPRIS）
-- Tauri 外掛（系統匣 / 通知 / 快捷鍵）
+- Tauri CLI
 
-## 效能策略
-
-- 持久化 WebView profile（快取與 cookie）
-- 啟動預熱（WebView 先初始化再顯示視窗）
-- 預設系統匣保活（避免頻繁冷啟動）
-- 狀態同步節流（避免高頻輪詢）
-
-不實作自訂靜態資源離線快取，依賴 WebView 核心快取機制。
-
-## DRM 與播放說明
-
-Apple Music Web 使用 DRM（EME/Widevine）。  
-播放能力依賴系統 WebKitGTK 與相關元件支援情況。
-
-Apperu Shell 不保證在所有 Linux 發行版環境中均可播放音訊。  
-若系統 WebView 不支援 DRM，應用將僅作為網頁容器運行。
-
-## 建置（規劃）
+### 開發模式
 
 ```bash
-# 依賴 Rust 與 Tauri CLI
 cargo tauri dev
 ```
 
-打包：
+### 建置
 
 ```bash
 cargo tauri build
 ```
 
-計畫發布：
+## 🤝 貢獻
 
-- AppImage
-- AUR 套件（後續）
+歡迎提交 Issue 與 Pull Request。
 
-## 開發階段
+提交 PR 前請確保：
 
-- WebView 容器與登入持久化
-- 播放狀態探針
-- JS 注入與狀態橋接
-- MPRIS 實作
-- 媒體鍵支援
-- 系統匣與通知
-- 啟動預熱與保活優化
+- 不引入 DRM 繞過行為
+- 不修改官方網頁邏輯
+- 維持最小侵入式封裝原則
 
-## 授權
+## 📜 授權
 
-本專案採用 Mozilla Public License Version 2.0（MPL-2.0）開源協議。
+本專案採用 Mozilla Public License Version 2.0 (MPL-2.0)。
 
-詳見 [LICENSE](LICENSE) 檔案。
+詳見 LICENSE。
 
----
+## ⚠ 免責聲明
 
-## 免責聲明
+Apperu Shell 與 Apple Inc. 無任何關聯。
 
-Apperu Shell 與 Apple Inc. 無關聯。  
-Apple Music 是 Apple Inc. 的商標與服務。  
-本專案僅作為網頁封裝工具，不提供任何侵權或繞過授權的功能。
+Apple Music 為 Apple Inc. 的商標與服務。
+
+本專案僅提供網頁封裝與桌面整合功能，不包含任何 DRM 繞過或修改行為。

@@ -1,92 +1,103 @@
 # Apperu Shell
 
-Apperu Shell は Apple Music Web をベースにした Linux デスクトップ向けシェルクライアントです。  
-本プロジェクトは、公式サービスの改変・リバースエンジニアリング・DRM 回避を行わずに、Linux でのデスクトップ統合体験とパフォーマンス最適化を提供することを目的としています。
+> Other languages: [简体中文](README.md) | [English](README.en.md) | [繁體中文](README.zh-TW.md)
 
-> 他言語: [简体中文](README.md) | [English](README.en.md) | [繁體中文](README.zh-TW.md)
+Apperu Shell は、Linux 向けに Apple Music Web のデスクトップ体験を提供する軽量ラッパーアプリケーションです。
 
-## プロジェクトの位置づけ
+公式 Web 版を基盤とし、デスクトップ統合と起動性能を強化します。
 
-Apperu Shell は独立したプレーヤーではなく、音声デコードやプロトコルのリバースエンジニアリングは実装しません。
+## ✨ プロジェクト目標
 
-<https://music.apple.com> の Web 版を基盤として動作し、次を提供します。
+- Linux 上でよりネイティブに近い Apple Music デスクトップ体験を提供
+- フルブラウザより軽量で制御しやすい実行環境を提供
+- コールドスタート速度とバックグラウンド常駐を最適化
+- 公式 Web 版との最大限の互換性を維持
 
-- Linux デスクトップ統合（MPRIS / メディアキー / トレイ）
-- コールドスタート体感の最適化（プリウォーム / トレイ常駐）
+## 🎯 機能
+
+- Linux デスクトップ統合
+  - MPRIS 対応
+  - メディアキー制御
+  - システムトレイ対応
+- コールドスタート最適化
+  - WebView プリウォーム
+  - トレイ常駐
 - デスクトップ通知
-- 軽量ラッピング（Tauri 優先）
+- 軽量ラッパー構成（Tauri ベース）
 
-## プロジェクト目標
+## 🚀 クイックスタート
 
-- Apple Music Web の安定した実行コンテナを提供
-- 完全な MPRIS 対応（GNOME / KDE で認識）
-- キーボードのメディアコントロール対応
-- トレイ常駐と高速復帰
-- DRM 回避や音声抽出機能は実装しない
+### 実行環境要件
 
-## 技術スタック（予定）
+- WebKitGTK（EME 対応版）
+- GStreamer
+- gst-plugins-base
+- gst-plugins-good
+- gst-libav
+- Widevine コンポーネント（DRM 用）
 
-- Tauri v2
+> システム WebView が DRM に対応していない場合、音声再生は行えず、Web コンテナとしてのみ動作します。
+
+## 🎵 再生および実行構造について
+
+Apperu Shell はシステムの WebKitGTK 上で動作し、独自のブラウザエンジンは内蔵していません。
+
+再生処理はすべてシステム WebView によって行われます。
+
+本プロジェクトは音声デコードや再生プロトコルの改変を行わず、デスクトップ用ラッパーとして機能します。
+
+Apple Music Web は EME + Widevine DRM を使用しています。
+
+Linux 上での再生可否は以下に依存します：
+
+- WebKitGTK が EME 対応でビルドされているか
+- Widevine が正しくインストールされているか
+- 必要な GStreamer プラグインが揃っているか
+
+DRM サポートはディストリビューションごとに異なります。
+環境によっては Web コンテナとしてのみ動作する場合があります。
+
+すべてのディストリビューションでの再生を保証するものではありません。
+
+## 🛠 開発およびビルド
+
+開発またはビルド時のみ必要：
+
 - Rust
-- WebKitGTK（Linux WebView）
-- zbus（DBus / MPRIS）
-- Tauri プラグイン（トレイ / 通知 / ショートカット）
+- Tauri CLI
 
-## パフォーマンス戦略
-
-- 永続化 WebView プロファイル（キャッシュと Cookie）
-- 起動プリウォーム（表示前に WebView を初期化）
-- 既定でトレイ常駐（頻繁なコールドスタートを回避）
-- 状態同期のスロットリング（高頻度ポーリングを回避）
-
-独自の静的アセットのオフラインキャッシュは実装せず、WebView エンジンのキャッシュ機構に依存します。
-
-## DRM と再生について
-
-Apple Music Web は DRM（EME/Widevine）を使用します。  
-再生可否はシステムの WebKitGTK と関連コンポーネントの対応状況に依存します。
-
-Apperu Shell は、すべての Linux ディストリビューションでの音声再生を保証しません。  
-システム WebView が DRM に対応していない場合、本アプリは Web コンテナとしてのみ動作します。
-
-## ビルド（予定）
+### 開発モード
 
 ```bash
-# Rust と Tauri CLI が必要
 cargo tauri dev
 ```
 
-パッケージ化:
+### ビルド
 
 ```bash
 cargo tauri build
 ```
 
-予定している配布形式:
+## 🤝 コントリビュート
 
-- AppImage
-- AUR パッケージ（後日）
+Issue や Pull Request を歓迎します。
 
-## 開発フェーズ
+PR 提出前に以下を確認してください：
 
-- WebView コンテナとログイン永続化
-- 再生状態プローブ
-- JS 注入と状態ブリッジ
-- MPRIS 実装
-- メディアキー対応
-- トレイと通知
-- 起動プリウォームと常駐最適化
+- DRM 回避動作を追加しないこと
+- 公式 Web ロジックを変更しないこと
+- 最小限のラッパー設計を維持すること
 
-## ライセンス
+## 📜 ライセンス
 
-本プロジェクトは Mozilla Public License Version 2.0（MPL-2.0）の下で公開されています。
+Mozilla Public License Version 2.0 (MPL-2.0) の下で公開されています。
 
-詳細は [LICENSE](LICENSE) を参照してください。
+詳細は LICENSE を参照してください。
 
----
+## ⚠ 免責事項
 
-## 免責事項
+Apperu Shell は Apple Inc. とは関係ありません。
 
-Apperu Shell は Apple Inc. とは無関係です。  
-Apple Music は Apple Inc. の商標およびサービスです。  
-本プロジェクトは Web ラッパーツールとしてのみ提供され、権利侵害や認可回避機能は提供しません。
+Apple Music は Apple Inc. の商標およびサービスです。
+
+本プロジェクトは Web ラッピングおよびデスクトップ統合のみを提供し、DRM の回避や改変は含みません。
