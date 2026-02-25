@@ -1,4 +1,12 @@
 (() => {
+  try {
+    if (window.top !== window) {
+      return;
+    }
+  } catch (_err) {
+    return;
+  }
+
   if (window.__apperuCleanup) {
     window.__apperuCleanup();
   }
@@ -15,14 +23,19 @@
 
   const emitPlayerState = async (payload) => {
     await invokeUpdate(payload);
-    if (window.__TAURI__?.event?.emit) {
-      window.__TAURI__.event.emit("player_state", payload);
-    }
   };
 
+  let lastDrmReason = "";
   const emitDrmState = (payload) => {
-    if (window.__TAURI__?.event?.emit) {
-      window.__TAURI__.event.emit("drm_status", payload);
+    if (payload?.drm_supported) {
+      lastDrmReason = "";
+      return;
+    }
+
+    const reason = payload?.reason || "unknown reason";
+    if (reason !== lastDrmReason) {
+      lastDrmReason = reason;
+      console.warn("[apperu] DRM unavailable:", reason);
     }
   };
 
@@ -65,15 +78,56 @@
     if (btn) btn.click();
   };
 
+  const HIDE_NATIVE_CTA_STYLE_ID = "apperu-hide-native-cta-style";
+  let nativeCtaStyleEl = null;
+
+  const hideNativeCta = () => {
+    if (!nativeCtaStyleEl || !nativeCtaStyleEl.isConnected) {
+      nativeCtaStyleEl = document.getElementById(HIDE_NATIVE_CTA_STYLE_ID);
+      if (!nativeCtaStyleEl) {
+        nativeCtaStyleEl = document.createElement("style");
+        nativeCtaStyleEl.id = HIDE_NATIVE_CTA_STYLE_ID;
+        nativeCtaStyleEl.textContent = `
+          #navigation > .navigation__native-cta {
+            display: none !important;
+          }
+        `;
+        const target = document.head || document.documentElement;
+        if (target) {
+          target.appendChild(nativeCtaStyleEl);
+        }
+      }
+    }
+
+    for (const node of document.querySelectorAll("#navigation > .navigation__native-cta")) {
+      node.style.setProperty("display", "none", "important");
+    }
+  };
+
   const probeDrm = async () => {
     try {
       if (!navigator.requestMediaKeySystemAccess) {
-        emitDrmState({ drm_supported: false, reason: "EME API unavailable in WebView" });
+        emitDrmState({
+          drm_supported: false,
+          reason: "EME API unavailable in WebView (navigator.requestMediaKeySystemAccess is missing)"
+        });
         return;
       }
+
+      const keySystem = "com.widevine.alpha";
+      const configs = [{
+        initDataTypes: ["cenc"],
+        audioCapabilities: [{ contentType: "audio/mp4; codecs=\"mp4a.40.2\"" }],
+        videoCapabilities: [{ contentType: "video/mp4; codecs=\"avc1.42E01E\"" }]
+      }];
+      await navigator.requestMediaKeySystemAccess(keySystem, configs);
       emitDrmState({ drm_supported: true });
     } catch (err) {
-      emitDrmState({ drm_supported: false, reason: String(err) });
+      const reason = err instanceof Error ? err.message : String(err);
+      emitDrmState({
+        drm_supported: false,
+        reason: `requestMediaKeySystemAccess rejected: ${reason}`
+      });
     }
   };
 
@@ -90,15 +144,24 @@
   };
 
   probeDrm();
+  hideNativeCta();
   tick();
 
-  const observer = new MutationObserver(() => tick());
-  observer.observe(document.body, { subtree: true, childList: true, characterData: true });
+  const observer = new MutationObserver(() => {
+    hideNativeCta();
+    tick();
+  });
+  if (document.body) {
+    observer.observe(document.body, { subtree: true, childList: true, characterData: true });
+  }
   const intervalId = setInterval(tick, 800);
 
   window.__apperuCleanup = () => {
     observer.disconnect();
     clearInterval(intervalId);
+    if (nativeCtaStyleEl?.isConnected) {
+      nativeCtaStyleEl.remove();
+    }
     delete window.__apperuCleanup;
   };
 })();

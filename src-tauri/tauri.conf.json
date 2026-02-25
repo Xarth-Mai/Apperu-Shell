@@ -4,8 +4,6 @@
   "version": "0.1.0",
   "identifier": "com.apperu.shell",
   "build": {
-    "beforeDevCommand": "",
-    "devUrl": "",
     "frontendDist": "../web"
   },
   "app": {
@@ -16,8 +14,7 @@
         "label": "main",
         "width": 1280,
         "height": 860,
-        "url": "https://music.apple.com/",
-        "visible": false
+        "url": "https://music.apple.com/"
       }
     ],
     "security": {
@@ -25,12 +22,6 @@
     }
   },
   "bundle": {
-    "active": true,
-    "targets": ["appimage"],
-    "linux": {
-      "appimage": {
-        "bundleMediaFramework": false
-      }
-    }
+    "active": false
   }
 }

@@ -1,0 +1,16 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "music-remote",
+  "description": "Allow minimal IPC permissions for Apple Music remote web content.",
+  "windows": [
+    "main"
+  ],
+  "remote": {
+    "urls": [
+      "https://music.apple.com/*"
+    ]
+  },
+  "permissions": [
+    "notification:allow-is-permission-granted"
+  ]
+}
